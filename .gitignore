@@ -1,0 +1,4 @@
+.vscode
+
+self_test.go
+cmd/test/*
