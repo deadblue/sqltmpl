@@ -8,6 +8,8 @@ import (
 )
 
 var (
+	errEmptyTemplate = errors.New("template is empty")
+
 	errChainedPipeline = errors.New("chained pipeline is unsupported")
 	errFunctionCalling = errors.New("function or method calling is unsupported")
 

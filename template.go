@@ -2,6 +2,7 @@ package sqltmpl
 
 import (
 	"fmt"
+	"strings"
 	"text/template/parse"
 )
 
@@ -21,7 +22,16 @@ type Template[P any] interface {
 }
 
 // Parse parses SQL template and returns a [Template] object if successful.
-func Parse[P any](text string) (tmpl Template[P], err error) {
+func Parse[P any](line ...string) (tmpl Template[P], err error) {
+	var text string
+	if lineCount := len(line); lineCount == 0 {
+		err = errEmptyTemplate
+		return
+	} else if lineCount == 1 {
+		text = line[0]
+	} else {
+		text = strings.Join(line, "\n")
+	}
 	// Parse template
 	treeSet, err := parse.Parse(_RootName, text, "", "")
 	if err != nil {
@@ -39,11 +49,10 @@ func Parse[P any](text string) (tmpl Template[P], err error) {
 }
 
 // MustParse is like [Parse] but panics when parsing failed.
-func MustParse[P any](text string) Template[P] {
-	if tmpl, err := Parse[P](text); err != nil {
+func MustParse[P any](line ...string) Template[P] {
+	if tmpl, err := Parse[P](line...); err != nil {
 		panic(fmt.Sprintf(
-			"Parse SQL template failed!\nTemplate: %s\nError: %s",
-			text, err,
+			"Parse SQL template failed!\nError: %s", err,
 		))
 	} else {
 		return tmpl
