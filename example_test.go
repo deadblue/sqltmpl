@@ -12,12 +12,13 @@ type Params struct {
 }
 
 func Example() {
-	statement := `SELECT a, b, c FROM table WHERE id IN (
-	{{- range $index, $elem := .Ids -}}
-	{{ if $index }}, {{ end }}{{ $elem }}
-	{{- end -}}
-) AND type = {{ .Type }}`
-	tmpl := sqltmpl.MustParse[Params](statement)
+	tmpl := sqltmpl.MustParse[Params](
+		"SELECT a, b, c FROM table WHERE id IN (",
+		"{{- range $index, $elem := .Ids -}}",
+		"{{ if $index }}, {{ end }}{{ $elem }}",
+		"{{- end -}}",
+		") AND type = {{ .Type }}",
+	)
 
 	query, args := tmpl.MustRender(Params{
 		Ids:  []int{1, 2, 3},
