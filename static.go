@@ -18,7 +18,10 @@ func (t *_StaticTemplate[P]) Render(params P) (query string, args []any, err err
 	rv := reflect.ValueOf(params)
 	args = make([]any, len(t.argFields))
 	for index, fields := range t.argFields {
-		args[index] = toRawValue(getValue(rv, fields...))
+		args[index], err = toRawValue(getValue(rv, fields...))
+		if err != nil {
+			return
+		}
 	}
 	return
 }

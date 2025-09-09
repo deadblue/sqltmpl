@@ -74,9 +74,12 @@ func (r *_DynamicTemplateRenderer[P]) renderActionNode(
 	case parse.NodeBool, parse.NodeNumber, parse.NodeNil, parse.NodeString:
 		r.buf.WriteString(nodeToText(arg))
 	case parse.NodeDot, parse.NodeField, parse.NodeVariable:
+		if argValue, err := toRawValue(calcArgNode(arg, values)); err == nil {
+			r.args = append(r.args, argValue)
+		} else {
+			return err
+		}
 		r.buf.Write(_ParamPlaceholder)
-		nodeValue := calcArgNode(arg, values)
-		r.args = append(r.args, toRawValue(nodeValue))
 	default:
 		err = raiseUnsupportedNode(nodeType)
 	}
@@ -164,7 +167,7 @@ func (r *_DynamicTemplateRenderer[P]) renderWithNode(
 func calcPipeNode(
 	pipe *parse.PipeNode, values map[string]reflect.Value,
 ) (result reflect.Value, err error) {
-	// TODO: Support function
+	// TODO: Support function?
 	if err = assertSupportedPipeNode(pipe); err != nil {
 		return
 	}

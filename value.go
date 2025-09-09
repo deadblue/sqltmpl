@@ -1,6 +1,7 @@
 package sqltmpl
 
 import (
+	"database/sql/driver"
 	"reflect"
 )
 
@@ -24,12 +25,16 @@ func getValue(dotValue reflect.Value, path ...string) reflect.Value {
 	return value
 }
 
-func toRawValue(rv reflect.Value) any {
-	if rv.IsValid() {
-		return rv.Interface()
-	} else {
-		return nil
+func toRawValue(rv reflect.Value) (value any, err error) {
+	if !rv.IsValid() {
+		// TODO: Return error?
+		return
 	}
+	value = rv.Interface()
+	if dv, ok := value.(driver.Valuer); ok {
+		value, err = dv.Value()
+	}
+	return
 }
 
 func toBoolValue(rv reflect.Value) bool {
